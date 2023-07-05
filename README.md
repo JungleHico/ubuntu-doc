@@ -19,6 +19,7 @@
 - 查看当前目录：`ls`（追加 `-a` 参数可以查看隐藏文件）
 - 创建目录：`sudo mkdir xxx`
 - 递归删除文件夹：`sudo rm -r xxx`
+- 全局查找某个文件：`sudo find / -name xxx`
 - 查看 IP 地址：`ip addr` 
 - 下载软件：`sudo apt install xxx`
 - 删除软件：`sudo apt remove xxx`
@@ -195,4 +196,120 @@ ssh-keygen -t rsa -C "example@email.com"
 
 ```sh
 cat xxx/.ssh/id_rsa.pub
+```
+
+
+
+## nginx
+
+### 安装
+
+```sh
+sudo apt install nginx
+```
+
+检查是否安装完成
+
+```sh
+nginx -v
+```
+
+浏览器访问 `localhost`，可以看到 nginx 的默认欢迎页
+
+
+
+### 常用命令
+
+查看服务状态
+
+```sh
+service nginx status
+```
+
+关闭服务
+
+```sh
+sudo service nginx stop
+```
+
+重启服务
+
+```sh
+sudo service nginx restart
+```
+
+设置任务开机自启动
+
+```sh
+sudo systemctl enable nginx
+```
+
+
+
+### 配置
+
+首先，定位 nginx 的安装目录，`nginx.conf` 就是 nginx 的配置文件
+
+```sh
+sudo find / -name nginx.conf
+```
+
+修改配置文件：
+
+```sh
+http {
+	server {
+		listen		80;
+		server_name  localhost; # 如果需要外部访问，则改为本机ip
+		
+		location /vite-project {
+			alias	/home/web/vite-project;
+			index	index.html index.htm;
+			try_files $uri $uri/ index.html; # 设置文件查找规则，否则单页应用刷新/前进/后退会返回404页面
+		}
+	}
+}
+```
+
+> 注意：修改 nginx 配置文件之后，需要重启 nginx 服务才能生效
+
+> 注意：外部访问需要关闭防火墙或者开放对应端口
+
+如果 `location` 设置了子路径，则前端项目需要设置公共基础路径和路由路径（以 vite+Vue3 项目为例）：
+
+```typescript
+// router/index.ts
+import { createWebHistory } from 'vue-router';
+
+// ...
+
+const router = createRouter({
+  routes,
+  history: createWebHistory(import.meta.env.VITE_BASE_URL), // 设置路由基础路径
+});
+```
+
+```typescript
+// vite.config.ts
+import { defineConfig, ConfigEnv, loadEnv } from 'vite';
+import vue from '@vitejs/plugin-vue';
+
+export default defineConfig(({ mode }: ConfigEnv) => {
+  const env = loadEnv(mode, process.cwd());
+
+  return {
+    base: env.VITE_BASE_URL, // 设置公共基础路径
+    plugins: [vue()],
+  };
+});
+```
+
+```sh
+# .env.production
+VITE_BASE_URL = /vite-project/
+```
+
+```sh
+# .env.development
+VITE_BASE_URL = /
 ```
