@@ -25,10 +25,20 @@
 - 删除软件：`sudo apt remove xxx`
 - 查看已安装软件：`apt list --installed`
 - 查看某个软件是否已安装：`apt show xxx`
-- 查看某个服务：`ps -ef|grep xxx`
-- 开启某个服务：`sudo service xxx start`
 
-- 服务开机自启动：`sudo systemctl enable xxx`
+
+
+## 服务/进程管理
+
+- 查看服务状态：`service xxx status`
+- 启动服务：`sudo service xxx start`
+- 停止服务：`sudo service xxx stop`
+- 重启服务：`sudo service xxx restart`
+- 设置服务开机自启动：`sudo systemctl enable xxx`
+- 关闭服务开机自启动：`sudo systemctl disable xxx`
+- 查看某个服务：`ps -ef|grep xxx`
+- 强制杀死某个进程：`sudo kill -9 <pid>`
+- 强制杀死相关进程：`sudo killall -9 xxx`
 
 
 
@@ -96,6 +106,7 @@ sudo chmod o-w /home
 | CPU      | `lscpu`             |
 | 内存     | `free`              |
 | 硬盘     | `df -h`             |
+| 系统占用 | `top`               |
 
 
 
