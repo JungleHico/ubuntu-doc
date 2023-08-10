@@ -17,14 +17,21 @@
 
 - 快捷键：`Ctrl+Alt+T`
 - 查看当前目录：`ls`（追加 `-a` 参数可以查看隐藏文件）
+- 进入某个目录：`cd xxx`
 - 创建目录：`sudo mkdir xxx`
+- 删除文件：`sudo rm xxx`
 - 递归删除文件夹：`sudo rm -r xxx`
+- 拷贝文件：`sudo cp <file-path> <target-path>`
+- 拷贝文件夹：`sudo cp -r <file-path> <target-path>`
 - 全局查找某个文件：`sudo find / -name xxx`
 - 查看 IP 地址：`ip addr` 
 - 下载软件：`sudo apt install xxx`
 - 删除软件：`sudo apt remove xxx`
 - 查看已安装软件：`apt list --installed`
 - 查看某个软件是否已安装：`apt show xxx`
+- 查看所有环境变量：`export`
+- 查看 `PATH` 环境变量：`echo $PATH` 
+- 添加环境变量：打开 `/etc/profile` 文件，在末尾添加 `export PATH=$PATH:xxx`（`$PATH` 表示已有的环境变量，`:` 用于拼接变量，`xxx` 表示新变量的路径），保存后运行 `source /etc/profile` 更新配置
 
 
 
@@ -37,8 +44,10 @@
 - 设置服务开机自启动：`sudo systemctl enable xxx`
 - 关闭服务开机自启动：`sudo systemctl disable xxx`
 - 查看某个服务：`ps -ef|grep xxx`
+- 根据pid查找进程：`ps -p <pid>` 或 `top -p <pid>`
 - 强制杀死某个进程：`sudo kill -9 <pid>`
 - 强制杀死相关进程：`sudo killall -9 xxx`
+- 查看某个端口是否被占用：`sudo lsof -i:8080`
 
 
 
@@ -110,7 +119,7 @@ sudo chmod o-w /home
 
 
 
-## openssh-server
+## SSH
 
 想要其他机器访问本机，就需要配置 ssh 服务。
 
@@ -230,6 +239,12 @@ nginx -v
 
 
 ### 常用命令
+
+检查 nginx 配置文件是否正确
+
+```sh
+nginx -t
+```
 
 查看服务状态
 
