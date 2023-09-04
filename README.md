@@ -13,25 +13,34 @@
 
 
 
-## 命令行
+## 文件系统
 
-- 快捷键：`Ctrl+Alt+T`
-- 查看当前目录：`ls`（追加 `-a` 参数可以查看隐藏文件）
 - 进入某个目录：`cd xxx`
+- 查看当前目录下文件：`ls`（追加 `-a` 参数可以查看隐藏文件）
+- 查看当前目录下文件详细信息：`ll` 或 `ls -l` 
 - 创建目录：`sudo mkdir xxx`
 - 删除文件：`sudo rm xxx`
-- 递归删除文件夹：`sudo rm -r xxx`
+- 递归删除文件夹：`sudo rm -rf xxx`
 - 拷贝文件：`sudo cp <file-path> <target-path>`
 - 拷贝文件夹：`sudo cp -r <file-path> <target-path>`
+- 文件重命名：`sudo mv <原文件名> <新文件名>`
+- 移动文件：`sudo mv <原文件路径> <目标文件路径>`
 - 全局查找某个文件：`sudo find / -name xxx`
-- 查看 IP 地址：`ip addr` 
+- 文件解压：`tar -zvxf xxx.tar.gz`
+- 建立软连接：`ln -s <原始文件或目录路径> <软连接名称或路径>`
+- 查看当目录下各个文件/文件夹空间占用：`du -sh *`
+- 压缩：`tar -cvf xxx.tar xxx` 或 `tar czvf xxx.tar.gz xxx`
+- 解压缩：`tar -xvf xxx.tar` 或 `tar zxvf xxx.tar.gz`
+
+
+
+## 软件管理
+
+- 更新软件包列表：`sudo apt update`
 - 下载软件：`sudo apt install xxx`
 - 删除软件：`sudo apt remove xxx`
+- 删除软件依赖残留：`sudo apt autoremove`
 - 查看已安装软件：`apt list --installed`
-- 查看某个软件是否已安装：`apt show xxx`
-- 查看所有环境变量：`export`
-- 查看 `PATH` 环境变量：`echo $PATH` 
-- 添加环境变量：打开 `/etc/profile` 文件，在末尾添加 `export PATH=$PATH:xxx`（`$PATH` 表示已有的环境变量，`:` 用于拼接变量，`xxx` 表示新变量的路径），保存后运行 `source /etc/profile` 更新配置
 
 
 
@@ -48,6 +57,8 @@
 - 强制杀死某个进程：`sudo kill -9 <pid>`
 - 强制杀死相关进程：`sudo killall -9 xxx`
 - 查看某个端口是否被占用：`sudo lsof -i:8080`
+
+- 查看所有被占用的端口：`sudo ss -tuln`
 
 
 
@@ -116,6 +127,34 @@ sudo chmod o-w /home
 | 内存     | `free`              |
 | 硬盘     | `df -h`             |
 | 系统占用 | `top`               |
+
+
+
+## 其他命令行
+
+- 查看 IP 地址：`ip addr` 
+- 查看所有环境变量：`export`
+- 查看 `PATH` 环境变量：`echo $PATH` 
+- 添加环境变量：打开 `/etc/profile` 文件，在末尾添加 `export PATH=$PATH:xxx`（`$PATH` 表示已有的环境变量，`:` 用于拼接变量，`xxx` 表示新变量的路径），保存后运行 `source /etc/profile` 更新配置
+
+
+
+## NVIDIA 显卡驱动
+
+```sh
+sudo apt update
+sudo apt install ubuntu-drivers-common
+# 查看可用的驱动程序
+ubuntu-drivers list
+# 安装指定版本驱动
+sudo apt install nvidia-driver-<version>
+# 重启
+reboot
+# 验证
+nvidia-smi
+```
+
+> 注意：BIOS 需要禁用 Secure Boot，否则驱动可能无法加载
 
 
 
@@ -216,6 +255,22 @@ ssh-keygen -t rsa -C "example@email.com"
 
 ```sh
 cat xxx/.ssh/id_rsa.pub
+```
+
+
+
+## Docker
+
+```sh
+sudo apt install curl
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+```
+
+验证是否安装完成：
+
+```sh
+docker -v
 ```
 
 
