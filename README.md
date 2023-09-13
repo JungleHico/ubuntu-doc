@@ -221,6 +221,52 @@ sudo firewall-cmd --reload
 
 
 
+## gitlab
+
+- 下载 gitlab-ce（community-edition）
+
+  ```sh
+  curl -LO https://packages.gitlab.com/gitlab/gitlab-ce/packages/ubuntu/bionic/gitlab-ce_13.12.3-ce.0_amd64.deb/download.deb
+  ```
+
+- 安装
+
+  ```sh
+  sudo dpkg -i download.deb
+  ```
+
+- 修改配置文件
+
+  ```sh
+  vim /etc/gitlab/gitlab.rb
+  ```
+
+  ```diff
+  - external_url 'http://gitlab.example.com'
+  + external_url 'http://ip地址或域名'
+  ```
+
+- 配置
+
+  ```sh
+  sudo gitlab-ctl reconfigure
+  ```
+
+  第一次配置会安装自动对应的依赖
+
+- 访问：`http://ip地址或域名`，其他机器访问注意 ssh 服务和防火墙设置
+
+- 其他常用指令：
+
+  ```sh
+  sudo gitlab-ctl status
+  sudo gitlab-ctl start
+  sudo gitlab-ctl stop
+  sudo gitlab-ctl restart
+  ```
+
+  
+
 ## git
 
 - 安装
@@ -251,7 +297,7 @@ git config user.email
 ssh-keygen -t rsa -C "example@email.com"
 ```
 
-打开公钥进行复制、并添加到 Github 的 ssh key 设置页面
+打开公钥进行复制、并添加到 Github/Gitlab/gitee 的 ssh key 设置页面
 
 ```sh
 cat xxx/.ssh/id_rsa.pub
