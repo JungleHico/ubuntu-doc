@@ -4,12 +4,31 @@
 
 参考：[VirtualBox 安装 Ubuntu20.04 图文教程](https://zhuanlan.zhihu.com/p/504251587)
 
+> 注意：如果是AMD平台，可能需要在BIOS中启用AMD-V或SVM来启用硬件虚拟技术
+
 
 
 ## 虚拟机设置
 
 - 网络-桥接网卡
+
 - 共享粘贴板
+
+  1. 系统-高级-共享粘贴板-双向
+
+  2. 虚拟机安装 make 和 gcc
+
+     ```sh
+     sudo apt update
+     sudo apt install make
+     make -v
+     sudo apt install gcc
+     gcc -v
+     ```
+
+  3. 虚拟机窗口左上角-设备-安装增强功能（Virtual Guest Additions）
+
+  4. 重启虚拟机
 
 
 
@@ -26,11 +45,11 @@
 - 文件重命名：`sudo mv <原文件名> <新文件名>`
 - 移动文件：`sudo mv <原文件路径> <目标文件路径>`
 - 全局查找某个文件：`sudo find / -name xxx`
-- 文件解压：`tar -zvxf xxx.tar.gz`
 - 建立软连接：`ln -s <原始文件或目录路径> <软连接名称或路径>`
 - 查看当目录下各个文件/文件夹空间占用：`du -sh *`
 - 压缩：`tar -cvf xxx.tar xxx` 或 `tar czvf xxx.tar.gz xxx`
 - 解压缩：`tar -xvf xxx.tar` 或 `tar zxvf xxx.tar.gz`
+- 向另一台主机发送文件：`sudo scp <本机文件路径> <目标主机用户>@<目标主机ip>:<目标目录>`
 
 
 
@@ -149,7 +168,7 @@ ubuntu-drivers list
 # 安装指定版本驱动
 sudo apt install nvidia-driver-<version>
 # 重启
-reboot
+sudo reboot
 # 验证
 nvidia-smi
 ```
@@ -158,9 +177,41 @@ nvidia-smi
 
 
 
+## 固定 IP
+
+Ubuntu17.10 以后，默认采用 netplan 管理，配置文件为 `/etc/netplan` 目录下的 `*.yaml`，不同系统版本的名称可能会有差异，以 Ubuntu20.04 为例，使用管理员权限打开：
+
+```sh
+sudo vim /etc/netplan/01-network-manager-all.yaml
+```
+
+```sh
+network:
+  ethernets:
+    enp0s3:
+      dhcp4: no # 是否动态分配IP
+      addresses: [192.168.1.100/24] # IP地址和子网掩码
+      gateway4: 192.168.1.1 # 网关地址
+      nameservers:
+        addresses: [8.8.8.8, 8.8.4.4] # DNS服务器地址
+```
+
+- 找到 `network` 下的 `ethernets` 字段，没有则添加
+- `enp0s3`：网络名称，通过 `ip a` 进行查看，找到 `inet` 以 `192.168` 开头对应的网络名称
+- `dhcp4`：是否使用 DHCP 协议，改成 `no` 取消动态分配 IP
+- `addresses`：IP 地址和子网掩码
+- `gateway4`：网关地址，通过 `ip route` 查询，以 `default` 开头的 IP 就是
+- `nameservers.addresses`：DNS 服务器地址，通过 `cat /etc/resolv.conf` 查询，以 `nameserver` 开头的 IP 就是
+
+保存修改后，运行 `sudo netplan apply` 应用修改
+
+
+
 ## SSH
 
-想要其他机器访问本机，就需要配置 ssh 服务。
+想要其他机器访问本机，就需要配置 ssh 服务
+
+> 注意：配置 SSH 服务前，建议先固定本机 IP，否则 IP 变化之后其他机器就无法通过之前的 IP 进行访问
 
 - 安装：
 
@@ -252,7 +303,7 @@ sudo firewall-cmd --reload
   sudo gitlab-ctl reconfigure
   ```
 
-  第一次配置会安装自动对应的依赖
+  第一次配置会自动安装对应的依赖
 
 - 访问：`http://ip地址或域名`，其他机器访问注意 ssh 服务和防火墙设置
 
@@ -309,7 +360,7 @@ cat xxx/.ssh/id_rsa.pub
 
 ```sh
 sudo apt install curl
-curl -fsSL https://get.docker.com -o get-docker.sh
+sudo curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 ```
 
