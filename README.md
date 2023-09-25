@@ -197,7 +197,7 @@ network:
 ```
 
 - 找到 `network` 下的 `ethernets` 字段，没有则添加
-- `enp0s3`：网络名称，通过 `ip a` 进行查看，找到 `inet` 以 `192.168` 开头对应的网络名称
+- `enp0s3`：网络名称，通常是 `enp0s3`，如果是 VirtualBox 虚拟机，通常需要改成 `eth0`
 - `dhcp4`：是否使用 DHCP 协议，改成 `no` 取消动态分配 IP
 - `addresses`：IP 地址和子网掩码
 - `gateway4`：网关地址，通过 `ip route` 查询，以 `default` 开头的 IP 就是
