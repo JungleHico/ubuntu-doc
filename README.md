@@ -177,6 +177,41 @@ nvidia-smi
 
 
 
+## CUDA
+
+从 [NVIDIA官网](https://developer.nvidia.com/cuda-toolkit-archive) 下载对应版本的 CUDA runfile 并安装：
+
+```sh
+wget https://developer.download.nvidia.com/compute/cuda/11.8.0/local_installers/cuda_11.8.0_520.61.05_linux.run
+sudo sh cuda_11.8.0_520.61.05_linux.run
+```
+
+> 注意：安装 CUDA 时取消勾选 NVIDIA 驱动，上一步已经安装，如果直接通过 CUDA 安装驱动，可能与系统不兼容
+
+然后设置环境变量：
+
+```sh
+vim ~/.bashrc
+```
+
+```sh
+export PATH=/usr/local/cuda-11.8/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cuda-11.8/lib64:$LD_LIBRARY_PATHe ~/.bashrc
+```
+
+修改后执行以下命令生效：
+
+```sh
+source ~/.bashrc
+```
+
+验证：
+
+```sh
+nvcc --version
+```
+
+
 ## 固定 IP
 
 Ubuntu17.10 以后，默认采用 netplan 管理，配置文件为 `/etc/netplan` 目录下的 `*.yaml`，不同系统版本的名称可能会有差异，以 Ubuntu20.04 为例，使用管理员权限打开：
@@ -402,6 +437,29 @@ npm -v
 ```sh
 npm install -g pnpm
 pnpm -v
+```
+
+
+
+## Conda
+
+从 [Conda官网](https://docs.conda.io/projects/conda/en/stable/user-guide/install/linux.html) 下载对应版本并安装。安装完成后，打开新的终端进行验证：
+
+```sh
+conda --version
+```
+
+常见命令：
+
+```sh
+# 查看所有环境
+conda list -e
+# 创建新的Python环境
+conda create -n <环境名称> python=<python版本>
+# 切换到某个环境
+conda activate <环境名称>
+# 删除某个环境
+conda env remove -n <环境名称>
 ```
 
 
