@@ -47,8 +47,8 @@
 - 全局查找某个文件：`sudo find / -name xxx`
 - 建立软连接：`ln -s <原始文件或目录路径> <软连接名称或路径>`
 - 查看当目录下各个文件/文件夹空间占用：`du -sh *`
-- 压缩：`tar -cvf xxx.tar xxx` 或 `tar czvf xxx.tar.gz xxx`
-- 解压缩：`tar -xvf xxx.tar` 或 `tar zxvf xxx.tar.gz`
+- 压缩：`zip xxx.tar xxx` 或 `tar -cf xxx.tar xxx` 或 `tar -czf xxx.tar.gz xxx`
+- 解压缩：`unzip xxx.tar` 或 `tar -xf xxx.tar` 或 `tar -xzf xxx.tar.gz`
 - 向另一台主机发送文件：`sudo scp <本机文件路径> <目标主机用户>@<目标主机ip>:<目标目录>`
 
 
@@ -352,6 +352,56 @@ ssh-keygen -t rsa -C "example@email.com"
 
 ```sh
 cat xxx/.ssh/id_rsa.pub
+```
+
+
+
+## Node
+
+首先从 [nodejs官网](https://nodejs.org/en/download) 下载对应版本的 node.js
+
+然后解压缩：
+
+```sh
+tar -xf <文件名.tar.xz>
+```
+
+移动文件夹：
+
+```sh
+sudo mv node-xxx /usr/bin/node
+```
+
+设置环境变量：
+
+```sh
+sudo vim ~/.bashrc
+```
+
+在文件最后添加：
+
+```sh
+PATH=/usr/bin/node/bin:$PATH
+```
+
+保存后执行以下命令生效：
+
+```sh
+source ~/.bashrc
+```
+
+验证：
+
+```sh
+node -v
+npm -v
+```
+
+安装 pnpm：
+
+```sh
+npm install -g pnpm
+pnpm -v
 ```
 
 
