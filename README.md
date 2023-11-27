@@ -76,7 +76,6 @@
 - 强制杀死某个进程：`sudo kill -9 <pid>`
 - 强制杀死相关进程：`sudo killall -9 xxx`
 - 查看某个端口是否被占用：`sudo lsof -i:8080`
-
 - 查看所有被占用的端口：`sudo ss -tuln`
 
 
@@ -143,18 +142,72 @@ sudo chmod o-w /home
 | -------- | ------------------- |
 | 操作系统 | `cat /proc/version` |
 | CPU      | `lscpu`             |
-| 内存     | `free`              |
+| 内存     | `watch free -h`     |
 | 硬盘     | `df -h`             |
 | 系统占用 | `top`               |
 
 
 
-## 其他命令行
+## 网络
 
-- 查看 IP 地址：`ip addr` 
-- 查看所有环境变量：`export`
+- 查看所有 IP 地址：`ip addr`
+
+- 查看路由信息：
+
+  ```sh
+  ip route
+  ```
+
+  某个实例：
+
+  ```sh
+  default via 192.168.191.5 dev wlo1 proto dhcp metric 600 
+  169.254.0.0/16 dev docker0 scope link metric 1000 linkdown 
+  172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown 
+  192.168.191.0/24 dev wlo1 proto kernel scope link src 192.168.191.105 metric 600 
+  ```
+
+  其中，以 `default` 开头的 `192.168.191.5` 表示网关地址；最后一行 `192.168.191.0/24` 表示局域网地址，后面的 `192.168.191.105` 表示本机 IP
+
+- 使用 nmap 扫描局域网：
+
+  ```sh
+  sudo apt install nmap
+  nmap -sn 192.168.1.0/24 # 192.168.1.0/24为局域网网络地址
+  ```
+
+- 设置内网 IP：
+
+  设置内网 IP 和子网掩码：
+
+  ```sh
+  # sudo ip addr add <IP地址>/<子网掩码> dev <网络名称>
+  sudo ip addr add 192.168.4.93/24 dev enp2s0
+  ```
+
+  设置默认路由（网关）：
+
+  ```sh
+  sudo ip route | grep default # 查看网关地址
+  # sudo ip route add default via <网关地址> dev <网络名称>
+  sudo ip route add default via 192.168.4.1 dev enp2s0
+  ```
+
+  应用修改：
+
+  ```sh
+  sudo netplan apply
+  ```
+
+
+
+## 环境变量
+
+- 查看系统环境变量：`cat /etc/profile` 
+- 查看用户环境变量：`export`
 - 查看 `PATH` 环境变量：`echo $PATH` 
-- 添加环境变量：打开 `/etc/profile` 文件，在末尾添加 `export PATH=$PATH:xxx`（`$PATH` 表示已有的环境变量，`:` 用于拼接变量，`xxx` 表示新变量的路径），保存后运行 `source /etc/profile` 更新配置
+- 添加系统环境变量：使用管理员权限打开 `/etc/profile` 文件，在末尾添加 `PATH=$PATH:xxx`（`$PATH` 表示已有的环境变量，`:` 用于拼接变量，`xxx` 表示新变量的路径），保存后运行 `source /etc/profile` 更新配置
+- 添加用户环境变量：打开 `~/.bashrc` 文件，在末尾添加 `PATH=$PATH:xxx`（`$PATH` 表示已有的环境变量，`:` 用于拼接变量，`xxx` 表示新变量的路径），保存后运行 `source ~/.bashrc` 更新配置
 
 
 
@@ -196,7 +249,7 @@ vim ~/.bashrc
 
 ```sh
 export PATH=/usr/local/cuda-11.8/bin:$PATH
-export LD_LIBRARY_PATH=/usr/local/cuda-11.8/lib64:$LD_LIBRARY_PATHe ~/.bashrc
+export LD_LIBRARY_PATH=/usr/local/cuda-11.8/lib64:$LD_LIBRARY_PATH ~/.bashrc
 ```
 
 修改后执行以下命令生效：
