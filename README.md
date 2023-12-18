@@ -37,19 +37,25 @@
 - 进入某个目录：`cd xxx`
 - 查看当前目录下文件：`ls`（追加 `-a` 参数可以查看隐藏文件）
 - 查看当前目录下文件详细信息：`ll` 或 `ls -l` 
+- 查看当前绝对路径：`pwd`
 - 创建目录：`sudo mkdir xxx`
-- 删除文件：`sudo rm xxx`
+- 删除文件：`sudo rm [-f] xxx`（`-f` 表示强制删除）
 - 递归删除文件夹：`sudo rm -rf xxx`
 - 拷贝文件：`sudo cp <file-path> <target-path>`
 - 拷贝文件夹：`sudo cp -r <file-path> <target-path>`
 - 文件重命名：`sudo mv <原文件名> <新文件名>`
-- 移动文件：`sudo mv <原文件路径> <目标文件路径>`
+- 移动文件/重命名：`sudo mv <原文件路径> <目标文件路径>` （如果目标路径存在，则移动；如果目标路径不存在，则重命名）
 - 全局查找某个文件：`sudo find / -name xxx`
 - 建立软连接：`ln -s <原始文件或目录路径> <软连接名称或路径>`
 - 查看当目录下各个文件/文件夹空间占用：`du -sh *`
-- 压缩：`zip xxx.tar xxx` 或 `tar -cf xxx.tar xxx` 或 `tar -czf xxx.tar.gz xxx`
-- 解压缩：`unzip xxx.tar` 或 `tar -xf xxx.tar` 或 `tar -xzf xxx.tar.gz`
-- 向另一台主机发送文件：`sudo scp <本机文件路径> <目标主机用户>@<目标主机ip>:<目标目录>`
+- 压缩：`zip [-r] xxx.zip xxx`（`-r` 用于递归压缩文件夹）或  `tar -zcf xxx.gz xxx`
+- 解压缩：`unzip xxx.zip` 或 `tar -zxf xxx.gz`
+- 向另一台主机发送文件：`sudo scp [-r] <本机文件路径> <目标主机用户>@<目标主机ip>:<目标目录>` （`-r` 用于递归传输文件夹）
+- 查看某个文件内容：`cat <文件路径>`
+- 实时查看文件尾部内容（实时查看日志）：`tail -f <文件路径>`
+- 查看文件头部前 n 行：`head -n 100 <文件路径>`
+- 在某个文件中查找某个字符串：`grep <字符串> <文件名>`
+- vim 打开文件后，查找字符串：非编辑模式下输入 `/pattern`  并回车，按 `n` 键跳转到下一个匹配项，按 `N` 键跳转到上一个匹配项（还可以通过 `:set hlsearch` 和 `:set nohlsearch` 来开启/关闭高亮）
 
 
 
@@ -59,7 +65,7 @@
 - 下载软件：`sudo apt install xxx`
 - 删除软件：`sudo apt remove xxx`
 - 删除软件依赖残留：`sudo apt autoremove`
-- 查看已安装软件：`apt list --installed`
+- 查看已安装软件：`apt list --installed`（通过 `| grep <软件名称>` 可以查找特定软件）
 
 
 
@@ -71,7 +77,7 @@
 - 重启服务：`sudo service xxx restart`
 - 设置服务开机自启动：`sudo systemctl enable xxx`
 - 关闭服务开机自启动：`sudo systemctl disable xxx`
-- 查看某个服务：`ps -ef|grep xxx`
+- 查看某个服务：`ps -ef | grep xxx`
 - 根据pid查找进程：`ps -p <pid>` 或 `top -p <pid>`
 - 强制杀死某个进程：`sudo kill -9 <pid>`
 - 强制杀死相关进程：`sudo killall -9 xxx`
@@ -176,7 +182,7 @@ sudo chmod o-w /home
   nmap -sn 192.168.1.0/24 # 192.168.1.0/24为局域网网络地址
   ```
 
-- 设置内网 IP：
+- 设置内网 IP（方法一）：
 
   设置内网 IP 和子网掩码：
 
@@ -198,6 +204,34 @@ sudo chmod o-w /home
   ```sh
   sudo netplan apply
   ```
+
+- 设置内网 IP（方法二）：
+
+  Ubuntu17.10 以后，默认采用 netplan 管理，配置文件为 `/etc/netplan` 目录下的 `*.yaml`，不同系统版本的名称可能会有差异，以 Ubuntu20.04 为例，使用管理员权限打开：
+
+  ```sh
+  sudo vim /etc/netplan/01-network-manager-all.yaml
+  ```
+
+  ```sh
+  network:
+    ethernets:
+      enp0s3:
+        dhcp4: no # 是否动态分配IP
+        addresses: [192.168.1.100/24] # IP地址和子网掩码
+        gateway4: 192.168.1.1 # 网关地址
+        nameservers:
+          addresses: [8.8.8.8, 8.8.4.4] # DNS服务器地址
+  ```
+
+  - 找到 `network` 下的 `ethernets` 字段，没有则添加
+  - `enp0s3`：网络名称，可以通过 `ip addr` 查看，通常是 `enp0s3`，如果是 VirtualBox 虚拟机，通常需要改成 `eth0`
+  - `dhcp4`：是否使用 DHCP 协议，改成 `no` 取消动态分配 IP
+  - `addresses`：IP 地址和子网掩码
+  - `gateway4`：网关地址，通过 `ip route` 查询，以 `default` 开头的 IP 就是
+  - `nameservers.addresses`：DNS 服务器地址，通过 `cat /etc/resolv.conf` 查询，以 `nameserver` 开头的 IP 就是
+
+​	保存修改后，运行 `sudo netplan apply` 应用修改
 
 
 
@@ -263,35 +297,6 @@ source ~/.bashrc
 ```sh
 nvcc --version
 ```
-
-
-## 固定 IP
-
-Ubuntu17.10 以后，默认采用 netplan 管理，配置文件为 `/etc/netplan` 目录下的 `*.yaml`，不同系统版本的名称可能会有差异，以 Ubuntu20.04 为例，使用管理员权限打开：
-
-```sh
-sudo vim /etc/netplan/01-network-manager-all.yaml
-```
-
-```sh
-network:
-  ethernets:
-    enp0s3:
-      dhcp4: no # 是否动态分配IP
-      addresses: [192.168.1.100/24] # IP地址和子网掩码
-      gateway4: 192.168.1.1 # 网关地址
-      nameservers:
-        addresses: [8.8.8.8, 8.8.4.4] # DNS服务器地址
-```
-
-- 找到 `network` 下的 `ethernets` 字段，没有则添加
-- `enp0s3`：网络名称，通常是 `enp0s3`，如果是 VirtualBox 虚拟机，通常需要改成 `eth0`
-- `dhcp4`：是否使用 DHCP 协议，改成 `no` 取消动态分配 IP
-- `addresses`：IP 地址和子网掩码
-- `gateway4`：网关地址，通过 `ip route` 查询，以 `default` 开头的 IP 就是
-- `nameservers.addresses`：DNS 服务器地址，通过 `cat /etc/resolv.conf` 查询，以 `nameserver` 开头的 IP 就是
-
-保存修改后，运行 `sudo netplan apply` 应用修改
 
 
 
@@ -652,3 +657,12 @@ VITE_BASE_URL = /vite-project/
 # .env.development
 VITE_BASE_URL = /
 ```
+
+
+
+## FFmpeg/ffplay
+
+[FFmpeg](https://ffmpeg.org/download.html) 是一款强大的开源音视频编解码程序
+
+- 播放视频：`ffplay <视频文件/视频流>`
+- 拉取视频流，保存为视频文件：`ffmpeg -i <视频流> -c copy output.mp4`（`-c copy` 表示复制原始视频和音频，而不重新进行编码）
