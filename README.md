@@ -154,6 +154,55 @@ sudo chmod o-w /home
 
 
 
+## 硬盘管理
+
+- 查看硬盘分区：
+
+  ```sh
+  sudo fdisk -l
+  # 或
+  lsblk
+  ```
+
+- 挂载硬盘（临时）：
+
+  ```sh
+  sudo mkdir /mnet/mydisk
+  sudo mount /dev/sda1 /mnt/mydisk
+  ```
+
+- 取消挂载：
+
+  ```sh
+  sudo unmount /mnt/mydisk
+  ```
+
+- 挂载硬盘（开机自动挂载）：
+
+  ```sh
+  sudo vim /etc/fstab
+  ```
+
+  在文件中添加以下内容：
+
+  ```sh
+  /dev/sdb1   /mnt/mydisk   ext4   defaults   0   0
+  ```
+
+  保存后验证：
+
+  ```sh
+  mount -a
+  ```
+
+- 格式化硬盘（需要先取消挂载）：
+
+  ```sh
+  sudo mkfs.ext4 /dev/sda1
+  ```
+
+
+
 ## 网络
 
 - 查看所有 IP 地址：`ip addr`
@@ -609,7 +658,7 @@ http {
 		location /vite-project {
 			alias	/home/web/vite-project;
 			index	index.html index.htm;
-			try_files $uri $uri/ index.html; # 设置文件查找规则，否则单页应用刷新/前进/后退会返回404页面
+			try_files $uri $uri/ /index.html; # 设置文件查找规则，否则单页应用刷新/前进/后退会返回404页面
 		}
 	}
 }
