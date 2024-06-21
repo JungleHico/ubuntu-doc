@@ -88,13 +88,21 @@
 
 ## 用户权限
 
-### 修改用户密码
+### 用户管理
+
+创建新用户：
+
+```sh
+sudo adduser <新用户名>
+```
+
+修改用户密码：
 
 ```sh
 sudo passwd xxx
 ```
 
-### 命令行切换到某个用户
+命令行切换到某个用户：
 
 ```sh
 sudo su xxx
@@ -104,6 +112,8 @@ sudo su xxx
 
 ```sh
 ls -l
+# 或
+ll
 ```
 
 `-l` 参数可以查看访问权限，后面可以添加路径，默认当前路径
@@ -142,6 +152,14 @@ sudo chmod o-w /home
 
 
 
+### 修改文件所有者
+
+```sh
+sudo chown <新文件所有者>:<新文件组> <文件路径>
+```
+
+
+
 ## 系统信息
 
 | 信息     | 命令                |
@@ -167,14 +185,20 @@ sudo chmod o-w /home
 - 挂载硬盘（临时）：
 
   ```sh
-  sudo mkdir /mnet/mydisk
+  sudo mkdir /mnt/mydisk
   sudo mount /dev/sda1 /mnt/mydisk
   ```
 
 - 取消挂载：
 
   ```sh
-  sudo unmount /mnt/mydisk
+  sudo umount /mnt/mydisk
+  ```
+
+- 格式化硬盘（需要先取消挂载）：
+
+  ```sh
+  sudo mkfs.ext4 /dev/sda1
   ```
 
 - 挂载硬盘（开机自动挂载）：
@@ -192,14 +216,26 @@ sudo chmod o-w /home
   保存后验证：
 
   ```sh
-  mount -a
+  sudo mount -a
   ```
 
-- 格式化硬盘（需要先取消挂载）：
+- LVM 查看卷组信息：
 
   ```sh
-  sudo mkfs.ext4 /dev/sda1
+  sudo vgdisplay <卷组名称>
+  sudo vgdisplay ubuntu-vg
   ```
+
+  其中 `Free  PE / Size` 字段表示卷组空闲空间
+
+- LVM 创建新的逻辑卷：
+
+  ```sh
+  sudo lvcreate -L <空间大小>G -n <新逻辑卷名称> <卷组名称>
+  sudo lvcreate -L 100G -n new-lv ubuntu-vg 
+  ```
+
+  新建的逻辑卷（分区）为 `/dev/ubuntu-vg/new-lv`，格式化后就可以挂载了
 
 
 
@@ -414,6 +450,44 @@ sudo firewall-cmd --reload
 
 
 
+## git
+
+- 安装
+
+```sh
+sudo apt install git
+```
+
+- 检查是否安装完成
+
+```sh
+git
+```
+
+- 设置用户名邮箱
+
+```sh
+git config --global user.name "username"
+git config --global user.email "example@email.com"
+# 然后查看是否配置完成：
+git config user.name
+git config user.email
+```
+
+- 配置 ssh key
+
+```sh
+ssh-keygen -t rsa -C "example@email.com"
+```
+
+打开公钥进行复制、并添加到 Github/Gitlab/gitee 的 ssh key 设置页面
+
+```sh
+cat xxx/.ssh/id_rsa.pub
+```
+
+
+
 ## gitlab
 
 - 下载 gitlab-ce（community-edition）
@@ -458,47 +532,12 @@ sudo firewall-cmd --reload
   sudo gitlab-ctl restart
   ```
 
-  
-
-## git
-
-- 安装
-
-```sh
-sudo apt install git
-```
-
-- 检查是否安装完成
-
-```sh
-git
-```
-
-- 设置用户名邮箱
-
-```sh
-git config --global user.name "username"
-git config --global user.email "example@email.com"
-# 然后查看是否配置完成：
-git config user.name
-git config user.email
-```
-
-- 配置 ssh key
-
-```sh
-ssh-keygen -t rsa -C "example@email.com"
-```
-
-打开公钥进行复制、并添加到 Github/Gitlab/gitee 的 ssh key 设置页面
-
-```sh
-cat xxx/.ssh/id_rsa.pub
-```
 
 
 
 ## Node
+
+### 安装
 
 首先从 [nodejs官网](https://nodejs.org/en/download) 下载对应版本的 node.js
 
@@ -544,6 +583,48 @@ npm -v
 ```sh
 npm install -g pnpm
 pnpm -v
+```
+
+
+
+### node 服务自启动
+
+安装 pm2：
+
+```sh
+npm install -g pm2
+```
+
+启动某个服务：
+
+```sh
+pm2 start app.js [--name "app_name"]
+```
+
+创建 pm2 启动脚本：
+
+```sh
+pm2 startup
+```
+
+根据提示输入命令，例如：
+
+```sh
+sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u your-username --hp /home/your-username/.pm2
+```
+
+最后保存当前 pm2 列表，保存的进程会开机自启动：
+
+```sh
+pm2 save
+```
+
+其他命令：
+
+```sh
+pm2 list
+pm2 stop <名称>
+pm2 delete <名称>
 ```
 
 
